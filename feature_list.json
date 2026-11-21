@@ -1,0 +1,168 @@
+{
+  "features": [
+    {
+      "id": "feat-001",
+      "name": "monorepo 骨架",
+      "description": "pnpm workspace：apps/api（Nest 12）、apps/web（Next 16）、packages/shared（zod），根目录统一 dev/build/test",
+      "dependencies": [],
+      "status": "done",
+      "acceptance": [
+        "pnpm build 三个包都通过",
+        "pnpm dev 同时启动 web(3000) 与 api(3001)",
+        "api 只允许 http://localhost:3000 跨域"
+      ],
+      "evidence": "PR #1 已合并。pnpm build 全部通过；pnpm test 1 passed；curl localhost:3001 返回 Hello World!"
+    },
+    {
+      "id": "feat-002",
+      "name": "本地基础设施",
+      "description": "docker-compose 启动 PostgreSQL 与 Redis；.env.example；api 接入 Prisma 并能连上数据库",
+      "dependencies": ["feat-001"],
+      "status": "not-started",
+      "acceptance": [
+        "docker compose up -d 后 Postgres 与 Redis 可用",
+        ".env.example 列出所有需要的变量，.env 不进 git",
+        "api 启动时能连上数据库，有一个最小的连接测试"
+      ],
+      "evidence": ""
+    },
+    {
+      "id": "feat-003",
+      "name": "数据模型",
+      "description": "Prisma schema：求職者、職務経歴書（只存解析后的文本）、想定問答（问题、回答、根拠、要確認、所用模型）。MVP 单用户，但数据以求職者为单位",
+      "dependencies": ["feat-002"],
+      "status": "not-started",
+      "acceptance": [
+        "migration 能在空库上执行成功",
+        "所有业务表都挂在求職者之下",
+        "启动时自动保证存在一个默认求職者（单用户）"
+      ],
+      "evidence": ""
+    },
+    {
+      "id": "feat-004",
+      "name": "想定問答的 zod schema",
+      "description": "在 packages/shared 定义想定問答、根拠、要確認的结构化输出 schema 和类型，供大模型结构化输出、api 校验、web 展示共用",
+      "dependencies": ["feat-001"],
+      "status": "not-started",
+      "acceptance": [
+        "api 和 web 都从 @ai-interview/shared 导入同一份 schema",
+        "有单元测试覆盖合法与非法数据"
+      ],
+      "evidence": ""
+    },
+    {
+      "id": "feat-005",
+      "name": "職務経歴書上传与解析",
+      "description": "web 上传页（PDF / Word / 粘贴文本）→ api 解析为文本并保存；不保存原始文件；扫描版 PDF（抽不出文字）提示改为粘贴文本。第一个页面，此时引入 shadcn/ui",
+      "dependencies": ["feat-003"],
+      "status": "not-started",
+      "acceptance": [
+        "PDF、Word、粘贴文本三种方式都能得到文本并入库",
+        "原始文件不落盘、不入库",
+        "抽不出文字的 PDF 给出改为粘贴文本的提示"
+      ],
+      "evidence": ""
+    },
+    {
+      "id": "feat-006",
+      "name": "大模型多厂商接入",
+      "description": "主流厂商原生 SDK，其他走 OpenAI 兼容接口（Ollama 等）；Key 与可选模型写在 .env；界面下拉选择一个全局模型",
+      "dependencies": ["feat-002"],
+      "status": "not-started",
+      "acceptance": [
+        "至少接通一家原生厂商和一个 OpenAI 兼容接口",
+        "没配 Key 的厂商不出现在下拉里",
+        "能用选中的模型返回符合 zod schema 的结构化输出"
+      ],
+      "evidence": ""
+    },
+    {
+      "id": "feat-007",
+      "name": "共通問答生成（后台任务）",
+      "description": "BullMQ 任务（worker 与 api 同进程）：读職務経歴書，生成標準質問 + 深掘り質問的想定問答，进度通过 SSE 推送；记录所用模型。系统提示词的文体与长度是 README「待定」事项，开始前要和用户确认",
+      "dependencies": ["feat-004", "feat-005", "feat-006"],
+      "status": "not-started",
+      "acceptance": [
+        "提交后立即返回任务 ID，生成在后台进行",
+        "web 能通过 SSE 看到进度和完成状态",
+        "生成结果按 zod schema 校验后入库，并记录模型"
+      ],
+      "evidence": ""
+    },
+    {
+      "id": "feat-008",
+      "name": "根拠校验",
+      "description": "后端用字符串匹配校验每条回答的根拠是否真的存在于職務経歴書原文；不存在的视为编造，该条标为要確認",
+      "dependencies": ["feat-007"],
+      "status": "not-started",
+      "acceptance": [
+        "根拠在原文中找不到时，该条不会以正常回答入库",
+        "有单元测试覆盖：命中、未命中、空白与换行差异"
+      ],
+      "evidence": ""
+    },
+    {
+      "id": "feat-009",
+      "name": "想定問答集查看页",
+      "description": "web 展示共通問答：每条显示问题、回答、根拠；要確認的条目显示 Agent 的追问",
+      "dependencies": ["feat-008"],
+      "status": "not-started",
+      "acceptance": [
+        "標準質問与深掘り質問分组显示",
+        "根拠可展开查看原文片段",
+        "要確認条目与正常条目在视觉上明确区分"
+      ],
+      "evidence": ""
+    },
+    {
+      "id": "feat-010",
+      "name": "要確認补全",
+      "description": "求職者在要確認条目下回答追问，Agent 据此补全该条回答（先写后问）",
+      "dependencies": ["feat-009"],
+      "status": "not-started",
+      "acceptance": [
+        "回答后该条重新生成，要確認状态解除",
+        "求職者的回答作为新的根拠来源参与校验"
+      ],
+      "evidence": ""
+    },
+    {
+      "id": "feat-011",
+      "name": "单条编辑与改写",
+      "description": "每条想定問答可手动编辑、对单条下指令让 Agent 改写；求職者可自行追加问题",
+      "dependencies": ["feat-009"],
+      "status": "not-started",
+      "acceptance": [
+        "手动编辑后保存不丢失",
+        "指令改写只影响该条",
+        "追加的问题能生成回答，同样经过根拠校验"
+      ],
+      "evidence": ""
+    },
+    {
+      "id": "feat-012",
+      "name": "导出",
+      "description": "想定問答集导出为 Markdown，并提供浏览器打印成 PDF 的版式",
+      "dependencies": ["feat-009"],
+      "status": "not-started",
+      "acceptance": [
+        "下载的 Markdown 包含全部问题与回答",
+        "打印预览版式可读，不含界面按钮"
+      ],
+      "evidence": ""
+    },
+    {
+      "id": "feat-013",
+      "name": "质量评测样本",
+      "description": "3～5 份虚构職務経歴書作为 eval 样本，脚本检查根拠校验通过率、要確認标记、標準質問覆盖率",
+      "dependencies": ["feat-008"],
+      "status": "not-started",
+      "acceptance": [
+        "样本全部为虚构，不含真实个人信息",
+        "一条命令能跑完评测并输出三项指标"
+      ],
+      "evidence": ""
+    }
+  ]
+}
