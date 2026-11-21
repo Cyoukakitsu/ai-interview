@@ -1,0 +1,10 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+
+allowBuilds:
+  sharp: false
+  unrs-resolver: false
+
+catalog:
+  typescript: ^6.0.3
