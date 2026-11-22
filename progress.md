@@ -2,8 +2,8 @@
 
 ## Current State
 
-**Last Updated:** 2026-11-21
-**Active Feature:** 无（feat-001 已完成，下一个候选：feat-002 本地基础设施）
+**Last Updated:** 2026-11-22
+**Active Feature:** feat-002 本地基础设施（in-progress，分支 `feat/local-infra`，5 步做完 3 步）
 
 ## Status
 
@@ -14,11 +14,18 @@
 
 ### What's In Progress
 
-- 无（功能清单已经用户确认）
+- feat-002 本地基础设施
+  - [x] 1 `docker-compose.yml`：postgres:18 + redis:8，带 healthcheck，Postgres 数据存 named volume `pgdata`
+  - [x] 2 根目录 `.env.example` / `.env`；compose 从 `.env` 读 `POSTGRES_*`
+  - [x] 3 `apps/api` 接入 Prisma 7.10.1（`prisma7.config.ts` 读根 `.env`；build = `prisma generate && nest build`）
+  - [ ] 4 `PrismaService` + `PrismaModule`；`main.ts` 读根 `.env`
+  - [ ] 5 最小连接测试（放 `test/` 走 test:e2e，不进 `init.sh`，待用户确认）
 
 ### What's Next
 
-1. 开始 feat-002（docker-compose + Prisma），或先做不依赖数据库的 feat-004（shared 里的 zod schema）
+1. 先给用户复习第 1～3 步（用户说 Docker 与 Prisma 文件还没太理解）
+2. feat-002 第 4 步：PrismaService / PrismaModule
+3. feat-002 第 5 步：连接测试
 
 ## Blockers / Risks
 
@@ -32,15 +39,23 @@
   - Alternatives considered：各包各自版本（5.9 / 6.0 / 7.0），已放弃
 - **删除 @nestjs/observe**：Nest 模板默认接入的第三方遥测，现阶段不需要
 - **端口**：web 3000（Next 默认），api 3001
+- **Prisma 固定 7.10.1**：npm 的 `latest` 指向 8.0.0 RC，RC 之间仍有破坏性改动
+- **`.env` 只放根目录一份**：compose 与 api 共用；读取用 Node 自带 `process.loadEnvFile`，不装 dotenv
+- **Postgres 18 而非 19**：19 于 2026-11-19 刚发布；18 的 volume 挂 `/var/lib/postgresql`（不是旧教程的 `/data`）
+- **Redis 不挂 volume**：只放队列任务，丢了可重新生成
 - **功能清单只拆到 MVP**：路线图后续阶段（企業別問答、企業情報ストック、ヒアリング、模擬面接）等 MVP 完成后再拆
 
 ## Files Modified This Session
 
-- `CLAUDE.md`、`feature_list.json`、`progress.md`、`session-handoff.md`、`init.sh`：新建 harness
+- `docker-compose.yml`、`.env.example`（新）；`.gitignore` 加 `apps/api/src/generated/`
+- `apps/api/package.json`：Prisma 依赖，build 先 generate
+- `apps/api/prisma/schema.prisma`、`apps/api/prisma7.config.ts`（新）
+- `pnpm-workspace.yaml`：`allowBuilds` 放行 `prisma`、`@prisma/engines`
 
 ## Evidence of Completion
 
 - [x] `./init.sh`：install / build / lint / test 全部通过（2026-11-21）
+- [x] `./init.sh` 通过（2026-11-22，feat-002 第 3 步后）
 
 ## Notes for Next Session
 

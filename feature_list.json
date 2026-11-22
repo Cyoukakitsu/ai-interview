@@ -18,13 +18,13 @@
       "name": "本地基础设施",
       "description": "docker-compose 启动 PostgreSQL 与 Redis；.env.example；api 接入 Prisma 并能连上数据库",
       "dependencies": ["feat-001"],
-      "status": "not-started",
+      "status": "in-progress",
       "acceptance": [
         "docker compose up -d 后 Postgres 与 Redis 可用",
         ".env.example 列出所有需要的变量，.env 不进 git",
         "api 启动时能连上数据库，有一个最小的连接测试"
       ],
-      "evidence": ""
+      "evidence": "进行中（2026-11-22）：docker compose ps 两服务 healthy；psql select version() → 18.7；redis-cli ping → PONG；git check-ignore 确认 .env 被忽略；prisma migrate status 能连上库；删掉 src/generated 后 pnpm build 通过；./init.sh 通过。剩余：PrismaService/PrismaModule、连接测试"
     },
     {
       "id": "feat-003",
