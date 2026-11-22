@@ -31,6 +31,7 @@
 
 - [ ] 系统提示词的文体与长度未定（README「待定」）：会卡住 feat-007，要在那之前和用户定下来
 - [ ] 第二步的 Web 搜索 API 未定：不影响 MVP
+- [ ] 功能清单缺少部署功能（2026-11-22 发现）：README「技术方案」写部署用 `docker-compose.yml` 一键启动，但 feat-001～013 没有对应功能，api / web 也没有 Dockerfile。需要和用户确认后补一个功能（api、web 的 Dockerfile + compose 里用 `build:`）
 
 ## Decisions Made
 
