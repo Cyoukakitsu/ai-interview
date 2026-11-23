@@ -3,7 +3,7 @@
 ## Current State
 
 **Last Updated:** 2026-11-22
-**Active Feature:** feat-002 本地基础设施（in-progress，分支 `feat/local-infra`，5 步做完 3 步）
+**Active Feature:** 无（feat-002 已 done，待提交合并；下一个候选 feat-003 / feat-004 / feat-006）
 
 ## Status
 
@@ -18,14 +18,14 @@
   - [x] 1 `docker-compose.yml`：postgres:18 + redis:8，带 healthcheck，Postgres 数据存 named volume `pgdata`
   - [x] 2 根目录 `.env.example` / `.env`；compose 从 `.env` 读 `POSTGRES_*`
   - [x] 3 `apps/api` 接入 Prisma 7.10.1（`prisma7.config.ts` 读根 `.env`；build = `prisma generate && nest build`）
-  - [ ] 4 `PrismaService` + `PrismaModule`；`main.ts` 读根 `.env`
-  - [ ] 5 最小连接测试（放 `test/` 走 test:e2e，不进 `init.sh`，待用户确认）
+  - [x] 4 `PrismaService` + `PrismaModule`；`main.ts` 读根 `.env`（`onModuleInit` 用 `$queryRaw SELECT 1`，因 `$connect()` 在 adapter 模式下是懒连接）
+  - [x] 5 最小连接测试（`test/prisma.e2e-spec.ts`，走 test:e2e，不进 `init.sh`；`vitest.config.e2e.ts` 加载根 `.env`）
 
 ### What's Next
 
-1. 先给用户复习第 1～3 步（用户说 Docker 与 Prisma 文件还没太理解）
-2. feat-002 第 4 步：PrismaService / PrismaModule
-3. feat-002 第 5 步：连接测试
+1. 提交 feat-002、开 PR 合并
+2. 和用户确认下一个功能（feat-003 数据模型 / feat-004 zod schema / feat-006 多厂商，依赖均已满足）
+3. 第 1～3 步（Docker 与 Prisma 文件）用户说还没太理解，有空再复习
 
 ## Blockers / Risks
 

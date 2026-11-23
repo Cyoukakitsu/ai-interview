@@ -5,7 +5,7 @@
 ## Current Objective
 
 - Goal：feat-002 本地基础设施
-- Current status：5 步完成 3 步（compose / env / Prisma 接入），剩 PrismaService 与连接测试
+- Current status：feat-002 五步全部完成，已标 done，待提交 / PR
 - Branch / commit：`feat/local-infra`
 
 ## Completed This Session
@@ -34,7 +34,7 @@
 ## Blockers / Risks
 
 - 用户反馈 Docker 与 Prisma 文件的写法还没太理解：下次先复习，再写新代码
-- Prisma 7 + driver adapter 下 `$connect()` 是否真的建立连接未确认：第 4 步写完后停掉 Postgres 启动 api 验证，不报错就改为在 `onModuleInit` 里执行 `SELECT 1`
+- 已验证（2026-11-23）：adapter 模式下 `$connect()` 不真连库，停库后 api 照常启动；改成 `$queryRaw SELECT 1` 后停库启动报 ECONNREFUSED
 - 连接测试放 `test/`（test:e2e，不进 `init.sh`）是建议，尚待用户确认
 
 ## Next Session Startup
@@ -46,5 +46,5 @@
 
 ## Recommended Next Step
 
-- 复习第 1～3 步 → 第 4 步：`src/prisma/prisma.service.ts`、`prisma.module.ts`，`app.module.ts` 引入，`main.ts` 用 `process.loadEnvFile(new URL('../../../.env', import.meta.url))`（运行的是 `dist/main.js`）
+- 提交 feat-002 并开 PR；然后和用户确认下一个功能
 - 小改：`apps/api/prisma7.config.ts` 把 `process.loadEnvFile(...)` 挪到 `import` 下面
