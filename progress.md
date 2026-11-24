@@ -2,14 +2,16 @@
 
 ## Current State
 
-**Last Updated:** 2026-11-22
-**Active Feature:** 无（feat-002 已 done，待提交合并；下一个候选 feat-003 / feat-004 / feat-006）
+**Last Updated:** 2026-11-24
+**Active Feature:** 无（feat-004 已 done，待提交 / PR；下一个候选 feat-003 / feat-006）
 
 ## Status
 
 ### What's Done
 
 - [x] feat-001 monorepo 骨架（PR #1 已合并）
+- [x] feat-002 本地基础设施（PR #3 已合并）
+- [x] feat-004 想定問答的 zod schema（`packages/shared/src/qa.ts`；判别联合 ok / needs-confirmation；web 与 shared 新增 vitest）
 - [x] 建立 harness：`CLAUDE.md`、`feature_list.json`、`progress.md`、`session-handoff.md`、`init.sh`
 
 ### What's In Progress
@@ -23,8 +25,8 @@
 
 ### What's Next
 
-1. 提交 feat-002、开 PR 合并
-2. 和用户确认下一个功能（feat-003 数据模型 / feat-004 zod schema / feat-006 多厂商，依赖均已满足）
+1. 提交 feat-004（分支 `feat/qa-schema`）、开 PR 合并
+2. 和用户确认下一个功能（feat-003 数据模型 / feat-006 多厂商，依赖均已满足）
 3. 第 1～3 步（Docker 与 Prisma 文件）用户说还没太理解，有空再复习
 
 ## Blockers / Risks
