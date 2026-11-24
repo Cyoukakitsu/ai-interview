@@ -44,12 +44,12 @@
       "name": "想定問答的 zod schema",
       "description": "在 packages/shared 定义想定問答、根拠、要確認的结构化输出 schema 和类型，供大模型结构化输出、api 校验、web 展示共用",
       "dependencies": ["feat-001"],
-      "status": "not-started",
+      "status": "done",
       "acceptance": [
         "api 和 web 都从 @ai-interview/shared 导入同一份 schema",
         "有单元测试覆盖合法与非法数据"
       ],
-      "evidence": ""
+      "evidence": "2026-11-24：./init.sh 全部通过；shared 12 tests passed（packages/shared/test/qa.test.ts，覆盖合法与非法数据）；api 与 web 各有一个最小导入测试（apps/api/src/shared-import.spec.ts、apps/web/test/shared-import.test.ts），均从 @ai-interview/shared 导入 qaSchema 并通过。web 为此新增 vitest 与 test 脚本"
     },
     {
       "id": "feat-005",
