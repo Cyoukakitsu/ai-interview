@@ -6,3 +6,11 @@ dist/
 .agents/
 .claude/
 apps/api/src/generated/
+
+# Playwright
+test-results/
+playwright-report/
+
+# e2e 样本（由 apps/api/test/fixtures/make-fixtures.sh 生成）
+apps/api/test/fixtures/*.pdf
+apps/api/test/fixtures/*.docx
