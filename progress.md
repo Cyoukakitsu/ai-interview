@@ -2,8 +2,8 @@
 
 ## Current State
 
-**Last Updated:** 2026-11-24
-**Active Feature:** 无（feat-004 已 done，待提交 / PR；下一个候选 feat-003 / feat-006）
+**Last Updated:** 2026-11-26
+**Active Feature:** 无（feat-003 PR #5 待合并；feat-005 已 done，待提交 / PR；下一个候选 feat-006）
 
 ## Status
 
@@ -12,6 +12,8 @@
 - [x] feat-001 monorepo 骨架（PR #1 已合并）
 - [x] feat-002 本地基础设施（PR #3 已合并）
 - [x] feat-004 想定問答的 zod schema（`packages/shared/src/qa.ts`；判别联合 ok / needs-confirmation；web 与 shared 新增 vitest）
+- [x] feat-003 数据模型（Applicant / CareerDocument / InterviewQa；默认求職者用固定 id + skipDuplicates）
+- [x] feat-005 職務経歴書上传与解析（api：`POST /career-documents`、`/career-documents/upload`；web：上传页，引入 shadcn/ui 与 Playwright e2e）
 - [x] 建立 harness：`CLAUDE.md`、`feature_list.json`、`progress.md`、`session-handoff.md`、`init.sh`
 
 ### What's In Progress
@@ -25,17 +27,27 @@
 
 ### What's Next
 
-1. 提交 feat-004（分支 `feat/qa-schema`）、开 PR 合并
-2. 和用户确认下一个功能（feat-003 数据模型 / feat-006 多厂商，依赖均已满足）
+1. feat-003（PR #5）合并后，feat-005 的 PR（分支 `feat/resume-ingest`，从 `feat/data-model` 切出）再合并
+2. 和用户确认下一个功能（feat-006 多厂商；feat-007 要等 006）
+3. feat-007 入库时要映射枚举：zod 的 `deep-dive` / `needs-confirmation` ↔ Prisma 的 `deep_dive` / `needs_confirmation`
 3. 第 1～3 步（Docker 与 Prisma 文件）用户说还没太理解，有空再复习
 
 ## Blockers / Risks
+
+- [ ] 超出 feat-005 范围、未做：OCR（扫描版 PDF 目前只提示改为粘贴）、旧版 `.doc`、病毒扫描、加密 PDF 的专门提示（现在与损坏 PDF 同为 400）、PDF 硬换行不合并（feat-008 比对时要忽略空白与换行）
+- [ ] 界面语言未定（README 没写），web 目前用日语，待用户确认
 
 - [ ] 系统提示词的文体与长度未定（README「待定」）：会卡住 feat-007，要在那之前和用户定下来
 - [ ] 第二步的 Web 搜索 API 未定：不影响 MVP
 - [ ] 功能清单缺少部署功能（2026-11-22 发现）：README「技术方案」写部署用 `docker-compose.yml` 一键启动，但 feat-001～013 没有对应功能，api / web 也没有 Dockerfile。需要和用户确认后补一个功能（api、web 的 Dockerfile + compose 里用 `build:`）
 
 ## Decisions Made
+
+- **职务经历书文本入库前统一规范化**（`apps/api/src/resume/normalize-text.ts`）：NFKC + 去日文字符间空格 + 统一换行。原因：PDF 抽出的是康熙部首字符（⼭⽥），不规范化的话 feat-008 的根拠字符串匹配会永远对不上
+- **上传大小**：文件 5MB；文本 30,000 字（日文每字 3 字节，须在 Express 默认 100KB 请求体内，否则会先被框架 413 拦下）
+- **校验管道**：`APP_PIPE` 全局注册 `StandardSchemaValidationPipe`；`@Body({ schema })` 单写不会校验
+- **默认求職者**：固定 id + `createMany skipDuplicates`；Prisma `upsert` 是先查后插，并发会撞主键
+- **web 界面暂用日语**（README 未定界面语言，待用户确认）；暂未引入 TanStack Query（目前只有一次提交，有列表 / SSE 进度时再接）
 
 - **TypeScript 统一为 6.x**：用 pnpm catalog 在根目录统一
   - Context：TS 7 是 Go 重写版，Nest CLI 与 Next 依赖 TS 的 JS 接口
@@ -64,3 +76,4 @@
 
 - 业务代码默认由用户亲手写，AI 负责讲解和 review（见 `CLAUDE.md`「协作方式」）
 - 改了 `packages/shared` 要先构建它，api/web 才能看到改动
+- 跑 api `test:e2e` 与 web `test:e2e` 前，样本不在 git 里，先执行 `apps/api/test/fixtures/make-fixtures.sh`（需要 macOS + Chrome）；两个 e2e 都需要 `docker compose up -d`
