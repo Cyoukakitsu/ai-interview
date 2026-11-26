@@ -7,7 +7,8 @@ const SPACE_BETWEEN_JA = new RegExp(`(?<=${JA})[ \\t]+(?=${JA})`, 'gu');
  * 使同一内容无论来自 PDF、Word 还是粘贴，字符种类一致。
  * 不保证换行位置一致，所以 feat-008 匹配根拠时必须忽略空白与换行。
  *
- * ponytail: 不合并 PDF 的硬换行（无法区分段落换行和硬换行）
+ * ponytail: 不合并 PDF 的硬换行（无法区分段落换行和硬换行），
+ * feat-008 比对根拠时先忽略空白；仍误判时再考虑合并硬换行
  */
 export function normalizeText(raw: string): string {
   return raw

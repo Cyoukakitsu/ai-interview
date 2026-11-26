@@ -13,13 +13,10 @@ const MAX_PDF_PAGES = 30; // unpdf 一次会处理所有页，先限页数防止
 // ponytail: 阈值是经验值；混合页（部分图片）的 PDF 可能漏判，需要时改为按页判断
 const MIN_PDF_TEXT_LENGTH = 50;
 
-type FileKind = 'pdf' | 'docx';
-
 // 按文件头判断类型，不信扩展名和客户端给的 mimetype
-function detectKind(buf: Buffer): FileKind | null {
+function detectKind(buf: Buffer): 'pdf' | 'docx' | null {
   if (buf.subarray(0, 5).toString('latin1') === '%PDF-') return 'pdf';
-  if (buf.subarray(0, 4).equals(Buffer.from([0x50, 0x4b, 0x03, 0x04])))
-    return 'docx'; // docx 是 zip；不是 docx 的 zip 会在 mammoth 里报错
+  if (buf.subarray(0, 4).toString('latin1') === 'PK\x03\x04') return 'docx'; // docx 是 zip；不是 docx 的 zip 会在 mammoth 里报错
   return null;
 }
 

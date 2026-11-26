@@ -1,11 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import {
-  CAREER_DOCUMENT_MAX_LENGTH,
-  createCareerDocumentSchema,
-  SCANNED_PDF_ERROR_CODE,
-} from "@ai-interview/shared";
+import { SCANNED_PDF_ERROR_CODE } from "@ai-interview/shared";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -35,18 +31,13 @@ export function CareerDocumentForm() {
     setResult(null);
     try {
       if (mode === "file") {
-        if (!file) throw { status: 0, message: "ファイルを選択してください" } satisfies ApiError;
+        if (!file) throw { message: "ファイルを選択してください" } satisfies ApiError;
         const { id } = await createCareerDocumentFromFile(file);
         setResult({ kind: "ok", id });
       } else {
-        // 与 api 共用同一份 zod schema，提交前先在浏览器里校验
-        const parsed = createCareerDocumentSchema.safeParse({ text });
-        if (!parsed.success)
-          throw {
-            status: 0,
-            message: `本文を入力してください（${CAREER_DOCUMENT_MAX_LENGTH.toLocaleString()}文字以内）`,
-          } satisfies ApiError;
-        const { id } = await createCareerDocumentFromText(parsed.data);
+        if (!text.trim())
+          throw { message: "本文を入力してください" } satisfies ApiError;
+        const { id } = await createCareerDocumentFromText({ text });
         setResult({ kind: "ok", id });
       }
     } catch (e) {

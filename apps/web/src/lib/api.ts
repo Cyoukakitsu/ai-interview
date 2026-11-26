@@ -2,13 +2,13 @@ import type { CreateCareerDocumentInput } from "@ai-interview/shared";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
 
-export type ApiError = { status: number; code?: string; message: string };
+export type ApiError = { code?: string; message: string };
 
 // api 的错误体：{ message: string | string[], code?: string }
 async function toApiError(res: Response): Promise<ApiError> {
   const body = await res.json().catch(() => ({}));
   const message = Array.isArray(body.message) ? body.message.join("\n") : body.message;
-  return { status: res.status, code: body.code, message: message ?? "エラーが発生しました" };
+  return { code: body.code, message: message ?? "エラーが発生しました" };
 }
 
 async function post(path: string, init: RequestInit): Promise<{ id: string }> {
@@ -16,7 +16,7 @@ async function post(path: string, init: RequestInit): Promise<{ id: string }> {
   try {
     res = await fetch(`${API_URL}${path}`, { method: "POST", ...init });
   } catch {
-    throw { status: 0, message: "サーバーに接続できません" } satisfies ApiError;
+    throw { message: "サーバーに接続できません" } satisfies ApiError;
   }
   if (!res.ok) throw await toApiError(res);
   return res.json();
