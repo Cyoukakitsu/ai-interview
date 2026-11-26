@@ -11,3 +11,56 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+// 求職者：使用本应用准备面试的人。MVP 单用户，但所有数据都挂在它下面
+model Applicant {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+
+  // 反向关系：Prisma 要求两边都声明，这里不产生数据库列
+  documents CareerDocument[]
+  qas       InterviewQa[]
+}
+
+// 職務経歴書：只存解析后的文本，不存原始文件
+model CareerDocument {
+  id          String    @id @default(uuid())
+  applicantId String
+  // onDelete: Cascade → 删求職者时，它的職務経歴書一并删除
+  applicant   Applicant @relation(fields: [applicantId], references: [id], onDelete: Cascade)
+  text        String
+  createdAt   DateTime  @default(now())
+
+  qas InterviewQa[]
+}
+
+// 对应 packages/shared 的 qaKindSchema
+enum QaKind {
+  standard // 標準質問
+  deep_dive // 深掘り質問（Prisma 枚举值不能含 "-"，zod 里是 "deep-dive"，入库时要映射）
+}
+
+// 对应 packages/shared 的 qaSchema 的 status
+enum QaStatus {
+  ok
+  needs_confirmation // 要確認（zod 里是 "needs-confirmation"）
+}
+
+// 想定問答
+model InterviewQa {
+  id          String         @id @default(uuid())
+  applicantId String
+  applicant   Applicant      @relation(fields: [applicantId], references: [id], onDelete: Cascade)
+  documentId  String
+  document    CareerDocument @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  kind             QaKind
+  status           QaStatus
+  question         String
+  answer           String? // 要確認条目没有回答；ok 条目非空由 zod 在写入前保证
+  evidence         String[] // 根拠：職務経歴書的原文片段
+  followUpQuestion String? // 要確認条目才有，Agent 的追问
+
+  model     String // 生成所用的模型
+  createdAt DateTime @default(now())
+}

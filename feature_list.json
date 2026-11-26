@@ -31,13 +31,13 @@
       "name": "数据模型",
       "description": "Prisma schema：求職者、職務経歴書（只存解析后的文本）、想定問答（问题、回答、根拠、要確認、所用模型）。MVP 单用户，但数据以求職者为单位",
       "dependencies": ["feat-002"],
-      "status": "not-started",
+      "status": "done",
       "acceptance": [
         "migration 能在空库上执行成功",
         "所有业务表都挂在求職者之下",
         "启动时自动保证存在一个默认求職者（单用户）"
       ],
-      "evidence": ""
+      "evidence": "2026-11-26：prisma migrate reset（空库从头重放）成功，migration 20261126142723_init_data_model 应用；prisma validate 通过；三张表 Applicant / CareerDocument / InterviewQa 全部以 applicantId 挂在求職者下，外键 onDelete Cascade；PrismaService.onModuleInit 用固定 id + createMany skipDuplicates 保证默认求職者；空表下连续 30 次 pnpm test:e2e 全过且求職者恒为 1；./init.sh 全部通过。踩坑：先用 count+create 并发会建出 2 个，再改 upsert 仍会撞主键（Prisma upsert 先查后插），最终用 ON CONFLICT DO NOTHING"
     },
     {
       "id": "feat-004",
