@@ -56,13 +56,13 @@
       "name": "職務経歴書上传与解析",
       "description": "web 上传页（PDF / Word / 粘贴文本）→ api 解析为文本并保存；不保存原始文件；扫描版 PDF（抽不出文字）提示改为粘贴文本。第一个页面，此时引入 shadcn/ui",
       "dependencies": ["feat-003"],
-      "status": "not-started",
+      "status": "done",
       "acceptance": [
         "PDF、Word、粘贴文本三种方式都能得到文本并入库",
         "原始文件不落盘、不入库",
         "抽不出文字的 PDF 给出改为粘贴文本的提示"
       ],
-      "evidence": ""
+      "evidence": "2026-11-26：./init.sh 全部通过；api test:e2e 18 passed（apps/api/test/career-document.e2e-spec.ts：PDF / docx / 粘贴文本入库且规范化，扫描版 PDF 返回 422 SCANNED_PDF，坏文件 / 非 PDF·docx / 缺 file 返回 400，超 5MB 返回 413，上传前后系统临时目录文件数不变）；web 浏览器 e2e 5 passed（pnpm --filter @ai-interview/web test:e2e，Playwright + 本机 Chrome，覆盖 PDF / docx 上传成功、扫描版提示并切到粘贴、空文本与未选文件提示）；查库确认三条记录均为规范化文本。独立对照：unpdf 抽取与 pdftotext 字符集合完全一致（顺序更好）。PDF 里的康熙部首字符（⼭⽥⽉）经 NFKC 还原为正常汉字。浏览器 e2e 与 api test:e2e 都需要 Postgres，不进 init.sh"
     },
     {
       "id": "feat-006",
